@@ -1,12 +1,17 @@
 package ge.games.gegames.security;
 
-import io.jsonwebtoken.Claims;
+import ge.games.gegames.security.exception.RestApiException;
+import io.jsonwebtoken.*;
 import ge.games.gegames.security.details.AuthenticatedUsersService;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.util.function.Function;
 
 @Service
@@ -32,14 +37,30 @@ public class JwtService {
     private final CookieService cookieService;
 
 
-    private Claims extractAllClaims(String token, String secret){
+    private SecretKey getSignInKey(String secret){
+        byte [] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private Claims extractAllClaims(String token, String secret) {
         try {
-            return Jwts.parser().verifyWith(get)
+            return Jwts.parser().verifyWith(getSignInKey(secret)).build().parseSignedClaims(token).getPayload();
+        } catch (SignatureException e) {
+            throw new RestApiException(HttpStatus.UNAUTHORIZED, "Invalid JWT signature");
+        } catch (MalformedJwtException e) {
+            throw new RestApiException(HttpStatus.UNAUTHORIZED, "Invalid JWT token");
+        } catch (UnsupportedJwtException e) {
+            throw new RestApiException(HttpStatus.UNAUTHORIZED, "Unsupported JWT token");
+        } catch (ExpiredJwtException e) {
+            throw new RestApiException(HttpStatus.UNAUTHORIZED, "Expired JWT token");
+        } catch (IllegalArgumentException e) {
+            throw new RestApiException(HttpStatus.UNAUTHORIZED, "JWT claims string is empty");
         }
     }
 
     public <T> T extractClaim(String token, Function< Claims, T> claimResolver, String secret){
-        final Claims claims = extra(token, secret);
+        final Claims claims = extractAllClaims(token, secret);
+        return claimResolver.apply(claims);
     }
 
     private String getSecret(TokenTypeE tokenTypeE){
@@ -52,6 +73,6 @@ public class JwtService {
 
     public String extractUsername(String token, TokenTypeE tokenTypeE){
         String secret = getSecret(tokenTypeE);
-        return
+        return extractClaim(token,Claims::getSubject, secret);
     }
 }
