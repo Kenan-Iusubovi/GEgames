@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.function.Function;
 
 @Service
@@ -36,6 +39,27 @@ public class JwtService {
     private final AuthenticatedUsersService authenticatedUsersService;
     private final CookieService cookieService;
 
+
+
+    public String createToken(String mail, String secret, int leftTime){
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime expirationTime = currentTime.plusSeconds(leftTime);
+
+        return Jwts.builder()
+                .subject(mail)
+                .issuedAt(Date.from(currentTime.toInstant(ZoneOffset.UTC)))
+                .expiration(Date.from(expirationTime.toInstant(ZoneOffset.UTC)))
+                .signWith(getSignInKey(secret), Jwts.SIG.HS256)
+                .compact();
+    }
+
+    public String generateAccessToken(String mail){
+        return createToken(mail,jwtAccessSecret, accessTokenLifetime);
+    }
+
+    public String generateRefreshToken(String mail){
+        return createToken(mail, jwtRefreshSecret, refreshTokenLifetime);
+    }
 
     private SecretKey getSignInKey(String secret){
         byte [] keyBytes = Decoders.BASE64.decode(secret);
