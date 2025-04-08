@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -25,12 +26,17 @@ public class CookieService {
         return Optional.empty();
     }
 
-    public void createCookie(HttpServletResponse response, String name, String token, String path, boolean isHttpOnly,
+    public void createCookie(HttpServletResponse response, String tokenName, String token, String path,
                              int lifetime){
-        Cookie cookie = new Cookie(name, token);
-        cookie.setPath(path);
-        cookie.setHttpOnly(isHttpOnly);
-        cookie.setMaxAge(lifetime);
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(tokenName, token)
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(lifetime)
+                .sameSite("Strict")
+                .build();
+
+
+        response.addHeader("Set-Cookie",cookie.toString());
     }
 }

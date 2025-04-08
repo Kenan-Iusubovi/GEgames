@@ -13,11 +13,16 @@ public class AuthenticatedUsersService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+
+    public UserDetails loadUserByMail(String mail){
+        return loadUserByUsername(mail);
+    }
+
     @Override
-    public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return new AuthenticatedUser(
-                userRepository.findByMail(mail)
-                        .orElseThrow(() -> new UsernameNotFoundException("User With email <" + mail + "> not found ! "))
+                userRepository.findByMail(username)
+                        .orElseThrow(() -> new UsernameNotFoundException("User With email <" + username + "> not found ! "))
         );
     }
 }

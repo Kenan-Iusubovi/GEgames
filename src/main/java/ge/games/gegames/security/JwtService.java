@@ -6,16 +6,24 @@ import ge.games.gegames.security.details.AuthenticatedUsersService;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.el.parser.Token;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.Optional;
 import java.util.function.Function;
+
+import static ge.games.gegames.security.TokenTypeE.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +48,53 @@ public class JwtService {
     private final CookieService cookieService;
 
 
+    public ResponseCookie clearRefreshTokenCookie(){
+        return ResponseCookie.from(REFRESH_TOKEN_NAME, "")
+                .maxAge(0)
+                .path("/")
+                .httpOnly(true)
+                .sameSite("Strict")
+                .build();
+    }
+
+    public ResponseCookie clearAccessTokenCookie(){
+        return ResponseCookie.from(ACCESS_TOKEN_NAME, "")
+                .maxAge(0)
+                .path("/")
+                .httpOnly(true)
+                .sameSite("Strict")
+                .build();
+    }
+
+    public void processToken(HttpServletRequest request, HttpServletResponse response){
+        Optional<String> refreshToken = cookieService.getCookieValueByName(request, REFRESH_TOKEN_NAME);
+        if (refreshToken.isEmpty() || !isTokenValid(refreshToken.get(), REFRESH)){
+            throw new RestApiException(HttpStatus.FORBIDDEN, "Token doesn't exist");
+        }
+
+        final String mail = extractMail(refreshToken.get(), REFRESH);
+        UserDetails userDetails = authenticatedUsersService.loadUserByMail(mail);
+        String accessToken = generateAccessToken(userDetails.getUsername());
+        cookieService.createCookie(response, ACCESS_TOKEN_NAME, accessToken, "/", accessTokenLifetime);
+
+        response.setHeader("X-XSS-Protection", "1; mode=block");
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    private Date extractExpiration(String token, String secret){
+        return extractClaim(token, Claims::getExpiration, secret);
+    }
+
+    public boolean isTokenExpired(String token, TokenTypeE tokenTypeE){
+        String secret = getSecret(tokenTypeE);
+        return extractExpiration(token, secret).before(new Date());
+    }
+
+    public boolean isTokenValid(String token, TokenTypeE tokenTypeE){
+        final String mail = extractMail(token, tokenTypeE);
+        UserDetails userDetails = authenticatedUsersService.loadUserByMail(mail);
+        return mail.equals(userDetails.getUsername()) && !isTokenExpired(token, tokenTypeE);
+    }
 
     public String createToken(String mail, String secret, int leftTime){
         LocalDateTime currentTime = LocalDateTime.now();
@@ -53,12 +108,12 @@ public class JwtService {
                 .compact();
     }
 
-    public String generateAccessToken(String mail){
-        return createToken(mail,jwtAccessSecret, accessTokenLifetime);
+    public String generateAccessToken(String username){
+        return createToken(username,jwtAccessSecret, accessTokenLifetime);
     }
 
-    public String generateRefreshToken(String mail){
-        return createToken(mail, jwtRefreshSecret, refreshTokenLifetime);
+    public String generateRefreshToken(String username){
+        return createToken(username, jwtRefreshSecret, refreshTokenLifetime);
     }
 
     private SecretKey getSignInKey(String secret){
@@ -95,7 +150,7 @@ public class JwtService {
         return jwtAccessSecret;
     }
 
-    public String extractUsername(String token, TokenTypeE tokenTypeE){
+    public String extractMail(String token, TokenTypeE tokenTypeE){
         String secret = getSecret(tokenTypeE);
         return extractClaim(token,Claims::getSubject, secret);
     }
