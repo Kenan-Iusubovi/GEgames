@@ -1,5 +1,6 @@
 package ge.games.gegames.security;
 
+import ge.games.gegames.security.coockie.CookieService;
 import ge.games.gegames.security.exception.RestApiException;
 import io.jsonwebtoken.*;
 import ge.games.gegames.security.details.AuthenticatedUsersService;
@@ -9,7 +10,6 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.el.parser.Token;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -38,10 +38,10 @@ public class JwtService {
     @Value("${jwt.rt.secret}")
     private String jwtRefreshSecret;
 
-    @Value("${jwt.at.lifetime")
+    @Value("${jwt.at.lifetime}")
     private int accessTokenLifetime;
 
-    @Value("${jwt.rt.lifetime")
+    @Value("${jwt.rt.lifetime}")
     private int refreshTokenLifetime;
 
     private final AuthenticatedUsersService authenticatedUsersService;
@@ -72,7 +72,7 @@ public class JwtService {
             throw new RestApiException(HttpStatus.FORBIDDEN, "Token doesn't exist");
         }
 
-        final String mail = extractMail(refreshToken.get(), REFRESH);
+        final String mail = extractUsername(refreshToken.get(), REFRESH);
         UserDetails userDetails = authenticatedUsersService.loadUserByMail(mail);
         String accessToken = generateAccessToken(userDetails.getUsername());
         cookieService.createCookie(response, ACCESS_TOKEN_NAME, accessToken, "/", accessTokenLifetime);
@@ -91,7 +91,7 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, TokenTypeE tokenTypeE){
-        final String mail = extractMail(token, tokenTypeE);
+        final String mail = extractUsername(token, tokenTypeE);
         UserDetails userDetails = authenticatedUsersService.loadUserByMail(mail);
         return mail.equals(userDetails.getUsername()) && !isTokenExpired(token, tokenTypeE);
     }
@@ -150,7 +150,7 @@ public class JwtService {
         return jwtAccessSecret;
     }
 
-    public String extractMail(String token, TokenTypeE tokenTypeE){
+    public String extractUsername(String token, TokenTypeE tokenTypeE){
         String secret = getSecret(tokenTypeE);
         return extractClaim(token,Claims::getSubject, secret);
     }

@@ -1,4 +1,4 @@
-package ge.games.gegames.security;
+package ge.games.gegames.security.coockie;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
