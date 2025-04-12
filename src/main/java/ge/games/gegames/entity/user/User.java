@@ -54,8 +54,9 @@ public class User {
                 .nickname(dto.getNickname())
                 .mail(dto.getMail())
                 .password(dto.getPassword())
+                .roles(Set.of(new Role(2, "USER")))
                 .userStatusE(UserStatusE.NOT_CONFIRMED)
-                .roles(Rol)
+                .build();
     }
 
     public static User from(UserDto dto){
@@ -76,7 +77,7 @@ public class User {
         if (dto == null){
             throw EntityMappingException.noEntity(CLASS_NAME);
         }
-        if (dto.getId() == 0){
+        if (dto.getId() < 0){
             throw EntityMappingException.blankField("ID", CLASS_NAME);
         }
         if (dto.getNickname().isBlank()){

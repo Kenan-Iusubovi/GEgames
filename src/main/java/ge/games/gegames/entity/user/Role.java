@@ -53,7 +53,7 @@ public class Role {
         if (role == null){
             throw EntityMappingException.noEntity(CLASS_NAME);
         }
-        if (role.getId() == 0){
+        if (role.getId() < 0){
             throw EntityMappingException.blankField("ID", CLASS_NAME);
         }
         if (role.getName().isBlank()){

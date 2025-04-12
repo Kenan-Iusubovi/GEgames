@@ -46,7 +46,7 @@ public class UserDto {
         if (user == null){
             throw EntityMappingException.noEntity(CLASS_NAME);
         }
-        if (user.getId() == 0){
+        if (user.getId() < 0){
             throw EntityMappingException.blankField("ID", CLASS_NAME);
         }
         if (user.getNickname().isBlank()){

@@ -20,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,13 +37,10 @@ public class SecurityConfig {
     JwtAuthFilter jwtAuthFilter;
 
     public static final String[] AUTH_WHITELIST = {
-            "api/auth/register",
-            "api/auth/token/refresh",
-            "api/auth/login",
-            "api/auth/logout",
-            "api/user/email-confirmation/**",
-            "api/user/forgot-password/**",
-            "api/user/cancel-deletion/**",
+            "/api/auth/**",
+            "/api/user/email-confirmation/**",
+            "/api/user/forgot-password/**",
+            "/api/user/cancel-deletion/**",
             "/",
             "/index.html",
             "/static/**",
@@ -69,18 +65,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers(AUTH_WHITELIST).permitAll().anyRequest().authenticated())
+        httpSecurity
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
-                        .defaultAuthenticationEntryPointFor(new AuthenticationEntryPointHandler(), new AntPathRequestMatcher("/**"))
-                        .accessDeniedHandler(new AuthAccessDeniedHandler()))
+                        .authenticationEntryPoint(new AuthenticationEntryPointHandler())
+                        .accessDeniedHandler(new AuthAccessDeniedHandler())
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authenticationProvider());
+
         return httpSecurity.build();
     }
 
@@ -93,12 +95,13 @@ public class SecurityConfig {
                 "http://localhost:3000"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/user/email-confirmation/**", configuration);
-        source.registerCorsConfiguration("/api/auth/**", configuration);
-        source.registerCorsConfiguration("/api/user/forgot-password/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); // Apply to all paths
         return source;
     }
 }
