@@ -44,6 +44,7 @@ public class User {
     private Set<Role> roles;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private UserStatusE userStatusE;
 
 
