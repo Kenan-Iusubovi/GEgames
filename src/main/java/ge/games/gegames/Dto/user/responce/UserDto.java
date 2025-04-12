@@ -1,6 +1,8 @@
-package ge.games.gegames.Dto;
+package ge.games.gegames.Dto.user.responce;
 
+import ge.games.gegames.Dto.RoleDto;
 import ge.games.gegames.entity.user.User;
+import ge.games.gegames.enums.UserStatusE;
 import ge.games.gegames.exception.EntityMappingException;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +25,8 @@ public class UserDto {
 
     private Set<RoleDto> roles;
 
+    private UserStatusE userStatusE;
+
 
     public static UserDto from(User user){
 
@@ -32,7 +36,8 @@ public class UserDto {
                 .id(user.getId())
                 .nickname(user.getNickname())
                 .mail(user.getMail())
-                .roles(RoleDto.fromSet(user.getRoles()))
+                .roles(RoleDto.setFrom(user.getRoles()))
+                .userStatusE(user.getUserStatusE())
                 .build();
     }
 
@@ -52,6 +57,9 @@ public class UserDto {
         }
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
             throw EntityMappingException.blankField("ROLES", CLASS_NAME);
+        }
+        if (user.getUserStatusE() == null) {
+            throw EntityMappingException.blankField("USER_STATUS", CLASS_NAME);
         }
     }
 }

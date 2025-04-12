@@ -1,13 +1,10 @@
 package ge.games.gegames.Dto;
 
 import ge.games.gegames.entity.user.Role;
-import ge.games.gegames.entity.user.User;
 import ge.games.gegames.exception.EntityMappingException;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.javapoet.ClassName;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +32,7 @@ public class RoleDto {
                 .build();
     }
 
-    public static Set<RoleDto> fromSet(Set<Role> roles){
+    public static Set<RoleDto> setFrom(Set<Role> roles){
 
         if(roles == null || roles.isEmpty()){
             return null;
