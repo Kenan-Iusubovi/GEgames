@@ -27,6 +27,17 @@ public class UserDto {
 
     private UserStatusE userStatusE;
 
+    private String message;
+
+
+    public static UserDto from(User user, String message){
+        UserDto dto = from(user);
+        if (message.isBlank()){
+            return dto;
+        }
+        dto.setMessage(message);
+        return dto;
+    }
 
     public static UserDto from(User user){
 

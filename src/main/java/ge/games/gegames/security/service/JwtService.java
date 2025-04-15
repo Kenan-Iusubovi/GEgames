@@ -1,6 +1,6 @@
-package ge.games.gegames.security;
+package ge.games.gegames.security.service;
 
-import ge.games.gegames.security.coockie.CookieService;
+import ge.games.gegames.security.TokenTypeE;
 import ge.games.gegames.security.exception.RestApiException;
 import io.jsonwebtoken.*;
 import ge.games.gegames.security.details.AuthenticatedUsersService;
@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -39,32 +40,17 @@ public class JwtService {
     private String jwtRefreshSecret;
 
     @Value("${jwt.at.lifetime}")
+    @Getter
     private int accessTokenLifetime;
 
     @Value("${jwt.rt.lifetime}")
+    @Getter
     private int refreshTokenLifetime;
 
     private final AuthenticatedUsersService authenticatedUsersService;
     private final CookieService cookieService;
 
 
-    public ResponseCookie clearRefreshTokenCookie(){
-        return ResponseCookie.from(REFRESH_TOKEN_NAME, "")
-                .maxAge(0)
-                .path("/")
-                .httpOnly(true)
-                .sameSite("Strict")
-                .build();
-    }
-
-    public ResponseCookie clearAccessTokenCookie(){
-        return ResponseCookie.from(ACCESS_TOKEN_NAME, "")
-                .maxAge(0)
-                .path("/")
-                .httpOnly(true)
-                .sameSite("Strict")
-                .build();
-    }
 
     public void processToken(HttpServletRequest request, HttpServletResponse response){
         Optional<String> refreshToken = cookieService.getCookieValueByName(request, REFRESH_TOKEN_NAME);

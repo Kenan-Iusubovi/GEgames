@@ -1,4 +1,4 @@
-package ge.games.gegames.security.coockie;
+package ge.games.gegames.security.service;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,5 +38,23 @@ public class CookieService {
 
 
         response.addHeader("Set-Cookie",cookie.toString());
+    }
+
+    public ResponseCookie clearRefreshTokenCookie(){
+        return ResponseCookie.from(JwtService.REFRESH_TOKEN_NAME, "")
+                .maxAge(0)
+                .path("/")
+                .httpOnly(true)
+                .sameSite("Strict")
+                .build();
+    }
+
+    public ResponseCookie clearAccessTokenCookie(){
+        return ResponseCookie.from(JwtService.ACCESS_TOKEN_NAME, "")
+                .maxAge(0)
+                .path("/")
+                .httpOnly(true)
+                .sameSite("Strict")
+                .build();
     }
 }
