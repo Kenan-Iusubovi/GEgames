@@ -46,7 +46,7 @@ public class UserDto {
         return UserDto.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
-                .mail(user.getMail())
+                .mail(user.getMail().toLowerCase())
                 .roles(RoleDto.setFrom(user.getRoles()))
                 .userStatusE(user.getUserStatusE())
                 .build();
