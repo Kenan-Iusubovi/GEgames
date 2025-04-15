@@ -25,6 +25,7 @@ public class User {
     @Id
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "nickname")

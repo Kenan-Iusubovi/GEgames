@@ -7,6 +7,7 @@ import ge.games.gegames.exception.UserAlreadyExistsException;
 import ge.games.gegames.exception.UserNotFoundException;
 import ge.games.gegames.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -38,8 +39,14 @@ public class UserService {
 
         isUserExistsOrThrow(dto.getMail());
 
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encryptedPassword = encoder.encode(dto.getPassword());
+        dto.setPassword(encryptedPassword);
+
         User user = User.registration(dto);
         user = repository.save(user);
-        return UserDto.from(user);
+
+        return UserDto.from(user, "Registration successful! A confirmation email has been sent to you." +
+                " Please check your inbox and spam folder. If you haven't received it, contact support.");
     }
 }

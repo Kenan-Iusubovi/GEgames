@@ -64,12 +64,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if(isFormWhiteList){
             filterChain.doFilter(request,response);
+            return;
         }
 
         Optional<String> accessToken = cookieService.getCookieValueByName(request, ACCESS_TOKEN_NAME);
 
         if (accessToken.isEmpty()){
             filterChain.doFilter(request, response);
+            return;
         }
 
         proccessTokenAthentication(request, accessToken.get());

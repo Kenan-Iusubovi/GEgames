@@ -24,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final String LOGIN_SUCCSSS = "Login Successful";
+    private final String LOGIN_SUCCESS = "Login Successful";
 
     private final AuthenticationManager manager;
 
@@ -77,6 +77,6 @@ public class AuthService {
 
         User user = userService.findUserByMail(request.getMail());
 
-        return UserDto.from(user, LOGIN_SUCCSSS);
+        return UserDto.from(user, LOGIN_SUCCESS);
     }
 }
