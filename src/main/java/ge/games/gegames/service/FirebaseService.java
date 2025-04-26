@@ -37,7 +37,7 @@ public class FirebaseService {
 
             return User.builder()
                     .id(0)
-                    .nickname("firebaseToken.getName")
+                    .nickname(firebaseToken.getEmail())
                     .login(firebaseToken.getEmail())
                     .roles(Set.of(new Role(2, "USER")))
                     .userStatusE(UserStatusE.BRONZE)
