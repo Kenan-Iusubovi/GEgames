@@ -1,5 +1,6 @@
 package ge.games.gegames.Dto.user.request;
 
+import ge.games.gegames.validation.EmailOrPhone;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,9 +14,8 @@ public class UserRegistrationDto {
     @Size(min = 4, max = 20)
     private String nickname;
 
-    @Email(message = "Email should be valid")
-    @NotBlank(message = "Email is required")
-    private String mail;
+    @EmailOrPhone(message = "Email or phone number required")
+    private String login;
 
     @NotBlank(message = "Password is required")
     @Pattern(

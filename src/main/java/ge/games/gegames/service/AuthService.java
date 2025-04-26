@@ -1,11 +1,11 @@
-package ge.games.gegames.security.service;
+package ge.games.gegames.service;
 
 import ge.games.gegames.Dto.user.request.UserLoginRequestDto;
 import ge.games.gegames.Dto.user.request.UserRegistrationDto;
 import ge.games.gegames.Dto.user.responce.UserDto;
-import ge.games.gegames.entity.user.User;
 import ge.games.gegames.security.exception.RestApiException;
-import ge.games.gegames.service.UserService;
+import ge.games.gegames.security.auth.CookieService;
+import ge.games.gegames.security.auth.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +15,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +34,29 @@ public class AuthService {
     private final UserService userService;
 
 
+
+    public UserDto firebaseLogin(String token, HttpServletResponse response){
+
+        UserDto user = userService.getUserByFirebaseToken(token);
+
+        try {
+
+            Authentication auth = manager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getLogin(), null
+                    ));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+        } catch (AuthenticationException e) {
+            throw new RestApiException(HttpStatus.UNAUTHORIZED,
+                    "We couldn't log you in with Google." +
+                            " Please try again later or choose another login option.");
+        }
+
+        setHeaderAndCookies(user,response);
+
+        return user;
+    }
 
     public void logout(HttpServletResponse response){
 
@@ -57,16 +79,27 @@ public class AuthService {
 
         try {
             Authentication auth = manager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getMail(), request.getPassword()
+                request.getLogin(), request.getPassword()
             ));
+
             SecurityContextHolder.getContext().setAuthentication(auth);
+
         }catch (BadCredentialsException e){
-            throw new RestApiException(HttpStatus.UNAUTHORIZED, "Invalid email or password please try again , " +
+            throw new RestApiException(HttpStatus.UNAUTHORIZED,
+                    "Invalid email or password please try again , " +
                     "or restore password with button RESTORE PASSWORD above");
         }
 
-        final String accessToken = jwtService.generateAccessToken(request.getMail());
-        final String refreshToken = jwtService.generateRefreshToken(request.getMail());
+        UserDto user = userService.getUserByLogin(request.getLogin());
+
+        setHeaderAndCookies(user,response);
+         return user;
+    }
+
+    private void setHeaderAndCookies(UserDto user, HttpServletResponse response){
+
+        final String accessToken = jwtService.generateAccessToken(user.getLogin());
+        final String refreshToken = jwtService.generateRefreshToken(user.getLogin());
 
         cookieService.createCookie(response, JwtService.ACCESS_TOKEN_NAME, accessToken,
                 "/", jwtService.getAccessTokenLifetime());
@@ -75,8 +108,6 @@ public class AuthService {
 
         response.setHeader("X-XSS-Protection", "1; mode=block");
 
-        User user = userService.findUserByMail(request.getMail());
-
-        return UserDto.from(user, LOGIN_SUCCESS);
+        user.setMessage(LOGIN_SUCCESS);
     }
 }

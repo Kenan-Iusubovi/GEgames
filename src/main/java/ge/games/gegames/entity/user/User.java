@@ -13,7 +13,7 @@ import jakarta.persistence.JoinColumn;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Data
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,8 +31,8 @@ public class User {
     @Column(name = "nickname")
     private String nickname;
 
-    @Column(name = "mail")
-    private String mail;
+    @Column(name = "login", nullable = false, unique = true)
+    private String login;
 
     @Column(name = "password")
     private String password;
@@ -54,7 +54,7 @@ public class User {
         return User.builder()
                 .id(0)
                 .nickname(dto.getNickname())
-                .mail(dto.getMail())
+                .login(dto.getLogin())
                 .password(dto.getPassword())
                 .roles(Set.of(new Role(2, "USER")))
                 .userStatusE(UserStatusE.NOT_CONFIRMED)
@@ -68,7 +68,7 @@ public class User {
         return User.builder()
                 .id(dto.getId())
                 .nickname(dto.getNickname())
-                .mail(dto.getMail())
+                .login(dto.getLogin())
                 .roles(Role.setFrom(dto.getRoles()))
                 .userStatusE(dto.getUserStatusE())
                 .build();
@@ -85,7 +85,7 @@ public class User {
         if (dto.getNickname().isBlank()){
             throw EntityMappingException.blankField("NICKNAME", CLASS_NAME);
         }
-        if (dto.getMail().isBlank()){
+        if (dto.getLogin().isBlank()){
             throw EntityMappingException.blankField("MAIL", CLASS_NAME);
         }
         if (dto.getRoles() == null || dto.getRoles().isEmpty()) {

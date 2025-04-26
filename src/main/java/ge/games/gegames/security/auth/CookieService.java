@@ -1,4 +1,4 @@
-package ge.games.gegames.security.service;
+package ge.games.gegames.security.auth;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

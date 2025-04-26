@@ -11,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -19,17 +18,40 @@ public class UserService {
 
     private final UserRepository repository;
 
+    private final FirebaseService firebaseService;
 
 
-    public User findUserByMail(String mail){
-        return repository.findByMail(mail).orElseThrow(
-                () -> new UserNotFoundException(mail)
+
+    public UserDto getUserByFirebaseToken(String token){
+        String email = firebaseService.getEmailFromToken(token);
+
+        if (isUserExists(email)){
+
+            return UserDto.from(findUserByEmailOrPhone(email));
+        }
+        return createUser(token);
+    }
+
+    public UserDto getUserByLogin(String email){
+
+        return UserDto.from(findUserByEmailOrPhone(email));
+    }
+
+    private User findUserByEmailOrPhone(String emailOrPhone){
+
+        return repository.findByLogin(emailOrPhone).orElseThrow(
+                () -> new UserNotFoundException(emailOrPhone)
         );
     }
 
-    public void isUserExistsOrThrow(String mail){
-       if (repository.findByMail(mail).isPresent()){
-           throw UserAlreadyExistsException.forField("EMAIL", mail);
+    private boolean isUserExists(String emailOrPhone){
+        return repository.findByLogin(emailOrPhone).isPresent();
+    }
+
+    private void isUserAlreadyExistsThrows(String emailOrPhone){
+
+       if (isUserExists(emailOrPhone)){
+           throw UserAlreadyExistsException.forField("EMAIL OR PHONE", emailOrPhone);
        }
     }
 
@@ -37,7 +59,7 @@ public class UserService {
 
         Objects.requireNonNull(dto, "User registration data corrupted");
 
-        isUserExistsOrThrow(dto.getMail());
+        isUserAlreadyExistsThrows(dto.getLogin());
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encryptedPassword = encoder.encode(dto.getPassword());
@@ -48,5 +70,13 @@ public class UserService {
 
         return UserDto.from(user, "Registration successful! A confirmation email has been sent to you." +
                 " Please check your inbox and spam folder. If you haven't received it, contact support.");
+    }
+
+    public UserDto createUser(String firebaseToken){
+
+        User user = firebaseService.createUser(firebaseToken);
+        user = repository.save(user);
+
+        return UserDto.from(user);
     }
 }

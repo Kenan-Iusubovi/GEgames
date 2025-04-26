@@ -21,7 +21,7 @@ public class UserDto {
 
     private String nickname;
 
-    private String mail;
+    private String login;
 
     private Set<RoleDto> roles;
 
@@ -46,7 +46,7 @@ public class UserDto {
         return UserDto.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
-                .mail(user.getMail().toLowerCase())
+                .login(user.getLogin().toLowerCase())
                 .roles(RoleDto.setFrom(user.getRoles()))
                 .userStatusE(user.getUserStatusE())
                 .build();
@@ -63,7 +63,7 @@ public class UserDto {
         if (user.getNickname().isBlank()){
             throw EntityMappingException.blankField("NICKNAME", CLASS_NAME);
         }
-        if (user.getMail().isBlank()){
+        if (user.getLogin().isBlank()){
             throw EntityMappingException.blankField("MAIL", CLASS_NAME);
         }
         if (user.getRoles() == null || user.getRoles().isEmpty()) {

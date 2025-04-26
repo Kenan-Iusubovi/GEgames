@@ -1,4 +1,4 @@
-package ge.games.gegames.security.service;
+package ge.games.gegames.security.auth;
 
 import ge.games.gegames.security.TokenTypeE;
 import ge.games.gegames.security.exception.RestApiException;
@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 

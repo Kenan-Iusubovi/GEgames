@@ -35,7 +35,7 @@ public class AuthenticatedUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getMail();
+        return user.getLogin();
     }
 
     @Override

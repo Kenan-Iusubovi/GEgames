@@ -1,8 +1,8 @@
 package ge.games.gegames.security;
 
-import ge.games.gegames.security.service.CookieService;
+import ge.games.gegames.security.auth.CookieService;
 import ge.games.gegames.security.details.AuthenticatedUsersService;
-import ge.games.gegames.security.service.JwtService;
+import ge.games.gegames.security.auth.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static ge.games.gegames.security.service.JwtService.ACCESS_TOKEN_NAME;
+import static ge.games.gegames.security.auth.JwtService.ACCESS_TOKEN_NAME;
 import static ge.games.gegames.security.TokenTypeE.ACCESS;
 import static ge.games.gegames.security.config.SecurityConfig.AUTH_WHITELIST;
 
