@@ -4,6 +4,7 @@ import ge.games.gegames.Dto.user.responce.UserDto;
 import ge.games.gegames.Dto.user.request.UserRegistrationDto;
 import ge.games.gegames.enums.UserStatusE;
 import ge.games.gegames.exception.EntityMappingException;
+import io.netty.util.internal.StringUtil;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.persistence.JoinTable;
@@ -82,10 +83,10 @@ public class User {
         if (dto.getId() < 0){
             throw EntityMappingException.blankField("ID", CLASS_NAME);
         }
-        if (dto.getNickname().isBlank()){
+        if (StringUtil.isNullOrEmpty(dto.getNickname())){
             throw EntityMappingException.blankField("NICKNAME", CLASS_NAME);
         }
-        if (dto.getLogin().isBlank()){
+        if (StringUtil.isNullOrEmpty(dto.getLogin())){
             throw EntityMappingException.blankField("MAIL", CLASS_NAME);
         }
         if (dto.getRoles() == null || dto.getRoles().isEmpty()) {

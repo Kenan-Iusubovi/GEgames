@@ -1,5 +1,6 @@
 package ge.games.gegames.validation;
 
+import io.netty.util.internal.StringUtil;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -12,7 +13,7 @@ public class EmailOrPhoneValidator implements ConstraintValidator<EmailOrPhone, 
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        if (s == null || s.isBlank()){
+        if (StringUtil.isNullOrEmpty(s)){
             return false;
         }
         return s.matches(EMAIL_REGEX) || s.matches(PHONE_REGEX);

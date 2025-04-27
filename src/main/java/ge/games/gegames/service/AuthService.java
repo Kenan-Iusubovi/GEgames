@@ -41,10 +41,8 @@ public class AuthService {
 
         try {
 
-            Authentication auth = manager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            user.getLogin(), null
-                    ));
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                    user.getLogin(), null);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
         } catch (AuthenticationException e) {

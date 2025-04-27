@@ -23,11 +23,11 @@ public class UserService {
 
 
     public UserDto getUserByFirebaseToken(String token){
-        String email = firebaseService.getEmailFromToken(token);
+        String login = firebaseService.getLoginFromToken(token);
 
-        if (isUserExists(email)){
+        if (isUserExists(login)){
 
-            return UserDto.from(findUserByEmailOrPhone(email));
+            return UserDto.from(findUserByEmailOrPhone(login));
         }
         return createUser(token);
     }

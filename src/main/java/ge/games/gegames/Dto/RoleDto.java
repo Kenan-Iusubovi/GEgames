@@ -2,9 +2,11 @@ package ge.games.gegames.Dto;
 
 import ge.games.gegames.entity.user.Role;
 import ge.games.gegames.exception.EntityMappingException;
+import io.netty.util.internal.StringUtil;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.StringUtils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,7 +53,7 @@ public class RoleDto {
         if (role.getId() < 0){
             throw EntityMappingException.blankField("ID", CLASS_NAME);
         }
-        if (role.getName().isBlank()){
+        if (StringUtil.isNullOrEmpty(role.getName())){
             throw EntityMappingException.blankField("NAME", CLASS_NAME);
         }
     }

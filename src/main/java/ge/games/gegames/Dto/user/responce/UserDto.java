@@ -4,6 +4,7 @@ import ge.games.gegames.Dto.RoleDto;
 import ge.games.gegames.entity.user.User;
 import ge.games.gegames.enums.UserStatusE;
 import ge.games.gegames.exception.EntityMappingException;
+import io.netty.util.internal.StringUtil;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +33,7 @@ public class UserDto {
 
     public static UserDto from(User user, String message){
         UserDto dto = from(user);
-        if (message.isBlank()){
+        if (StringUtil.isNullOrEmpty(message)){
             return dto;
         }
         dto.setMessage(message);
@@ -60,10 +61,10 @@ public class UserDto {
         if (user.getId() < 0){
             throw EntityMappingException.blankField("ID", CLASS_NAME);
         }
-        if (user.getNickname().isBlank()){
+        if (StringUtil.isNullOrEmpty(user.getNickname())){
             throw EntityMappingException.blankField("NICKNAME", CLASS_NAME);
         }
-        if (user.getLogin().isBlank()){
+        if (StringUtil.isNullOrEmpty(user.getLogin())){
             throw EntityMappingException.blankField("MAIL", CLASS_NAME);
         }
         if (user.getRoles() == null || user.getRoles().isEmpty()) {

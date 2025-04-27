@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseToken;
 import ge.games.gegames.entity.user.Role;
 import ge.games.gegames.entity.user.User;
 import ge.games.gegames.enums.UserStatusE;
+import io.netty.util.internal.StringUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -18,12 +19,17 @@ public class FirebaseService {
         return FirebaseAuth.getInstance().verifyIdToken(token);
     }
 
-    public String getEmailFromToken(String token) {
+    public String getLoginFromToken(String token) {
 
         try {
-            FirebaseToken firebaseToken = verifyToken(token);
+            FirebaseToken firebaseToken = FirebaseAuth.getInstance().verifyIdToken(token);
 
-            return firebaseToken.getEmail();
+            String login = firebaseToken.getEmail();
+
+            if (StringUtil.isNullOrEmpty(login)){
+                login = (String) firebaseToken.getClaims().get("phone_number");
+            }
+            return login;
 
         } catch (FirebaseAuthException e) {
             throw new RuntimeException("Invalid firebase token" + e);
@@ -32,20 +38,15 @@ public class FirebaseService {
 
     public User createUser(String token) {
 
-        try {
-            FirebaseToken firebaseToken = verifyToken(token);
-
             return User.builder()
                     .id(0)
-                    .nickname(firebaseToken.getEmail())
-                    .login(firebaseToken.getEmail())
+                    .nickname("User" + System.currentTimeMillis())
+                    .login(getLoginFromToken(token))
+                    .password("fire_base")
                     .roles(Set.of(new Role(2, "USER")))
                     .userStatusE(UserStatusE.BRONZE)
                     .build();
 
-        } catch (FirebaseAuthException e) {
-            throw new RuntimeException("Invalid firebase token" + e);
-        }
     }
 
 }

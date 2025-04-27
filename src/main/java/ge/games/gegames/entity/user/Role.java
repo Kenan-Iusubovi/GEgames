@@ -2,6 +2,7 @@ package ge.games.gegames.entity.user;
 
 import ge.games.gegames.Dto.RoleDto;
 import ge.games.gegames.exception.EntityMappingException;
+import io.netty.util.internal.StringUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -56,7 +57,7 @@ public class Role {
         if (role.getId() < 0){
             throw EntityMappingException.blankField("ID", CLASS_NAME);
         }
-        if (role.getName().isBlank()){
+        if (StringUtil.isNullOrEmpty(role.getName())){
             throw EntityMappingException.blankField("NAME", CLASS_NAME);
         }
     }
