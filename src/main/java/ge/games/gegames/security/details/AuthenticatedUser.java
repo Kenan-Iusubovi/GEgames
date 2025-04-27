@@ -1,7 +1,7 @@
 package ge.games.gegames.security.details;
 
 import ge.games.gegames.entity.user.User;
-import ge.games.gegames.entity.user.enums.UserStatusE;
+import ge.games.gegames.enums.UserStatusE;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,7 +35,7 @@ public class AuthenticatedUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getMail();
+        return user.getLogin();
     }
 
     @Override
