@@ -1,7 +1,6 @@
-package ge.games.gegames.Dto.user.request;
+package ge.games.gegames.dto.user.request;
 
 import ge.games.gegames.validation.EmailOrPhone;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;

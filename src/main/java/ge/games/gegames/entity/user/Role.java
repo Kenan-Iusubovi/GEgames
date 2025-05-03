@@ -1,6 +1,6 @@
 package ge.games.gegames.entity.user;
 
-import ge.games.gegames.Dto.RoleDto;
+import ge.games.gegames.dto.RoleDto;
 import ge.games.gegames.exception.EntityMappingException;
 import io.netty.util.internal.StringUtil;
 import jakarta.persistence.*;

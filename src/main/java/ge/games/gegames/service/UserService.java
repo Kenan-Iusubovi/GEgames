@@ -1,7 +1,7 @@
 package ge.games.gegames.service;
 
-import ge.games.gegames.Dto.user.request.UserRegistrationDto;
-import ge.games.gegames.Dto.user.responce.UserDto;
+import ge.games.gegames.dto.user.request.UserRegistrationDto;
+import ge.games.gegames.dto.user.responce.UserDto;
 import ge.games.gegames.entity.user.User;
 import ge.games.gegames.exception.UserAlreadyExistsException;
 import ge.games.gegames.exception.UserNotFoundException;
@@ -66,6 +66,7 @@ public class UserService {
         dto.setPassword(encryptedPassword);
 
         User user = User.registration(dto);
+        generateNickname(user);
         user = repository.save(user);
 
         return UserDto.from(user, "Registration successful! A confirmation email has been sent to you." +
@@ -75,8 +76,21 @@ public class UserService {
     public UserDto createUser(String firebaseToken){
 
         User user = firebaseService.createUser(firebaseToken);
+        generateNickname(user);
         user = repository.save(user);
 
         return UserDto.from(user);
+    }
+
+    private void generateNickname(User user){
+
+        while (user.getNickname() == null) {
+
+            String nickname = "User" + System.currentTimeMillis();
+
+            if (!repository.existsByNickname(nickname)){
+                user.setNickname(nickname);
+            }
+        }
     }
 }
