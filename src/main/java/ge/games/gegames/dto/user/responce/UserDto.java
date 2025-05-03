@@ -1,6 +1,6 @@
-package ge.games.gegames.Dto.user.responce;
+package ge.games.gegames.dto.user.responce;
 
-import ge.games.gegames.Dto.RoleDto;
+import ge.games.gegames.dto.RoleDto;
 import ge.games.gegames.entity.user.User;
 import ge.games.gegames.enums.UserStatusE;
 import ge.games.gegames.exception.EntityMappingException;

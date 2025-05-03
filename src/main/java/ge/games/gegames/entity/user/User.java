@@ -1,7 +1,7 @@
 package ge.games.gegames.entity.user;
 
-import ge.games.gegames.Dto.user.responce.UserDto;
-import ge.games.gegames.Dto.user.request.UserRegistrationDto;
+import ge.games.gegames.dto.user.responce.UserDto;
+import ge.games.gegames.dto.user.request.UserRegistrationDto;
 import ge.games.gegames.enums.UserStatusE;
 import ge.games.gegames.exception.EntityMappingException;
 import io.netty.util.internal.StringUtil;
@@ -29,7 +29,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "nickname")
+    @Column(name = "nickname", unique = true)
     private String nickname;
 
     @Column(name = "login", nullable = false, unique = true)
@@ -54,7 +54,6 @@ public class User {
 
         return User.builder()
                 .id(0)
-                .nickname(dto.getNickname())
                 .login(dto.getLogin())
                 .password(dto.getPassword())
                 .roles(Set.of(new Role(2, "USER")))
@@ -82,9 +81,6 @@ public class User {
         }
         if (dto.getId() < 0){
             throw EntityMappingException.blankField("ID", CLASS_NAME);
-        }
-        if (StringUtil.isNullOrEmpty(dto.getNickname())){
-            throw EntityMappingException.blankField("NICKNAME", CLASS_NAME);
         }
         if (StringUtil.isNullOrEmpty(dto.getLogin())){
             throw EntityMappingException.blankField("MAIL", CLASS_NAME);

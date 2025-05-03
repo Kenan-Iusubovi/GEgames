@@ -1,4 +1,4 @@
-package ge.games.gegames.Dto;
+package ge.games.gegames.dto;
 
 import ge.games.gegames.entity.user.Role;
 import ge.games.gegames.exception.EntityMappingException;
@@ -6,7 +6,6 @@ import io.netty.util.internal.StringUtil;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.StringUtils;
 
 import java.util.Set;
 import java.util.stream.Collectors;

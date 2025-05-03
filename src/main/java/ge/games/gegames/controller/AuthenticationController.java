@@ -1,8 +1,8 @@
 package ge.games.gegames.controller;
 
-import ge.games.gegames.Dto.user.request.UserLoginRequestDto;
-import ge.games.gegames.Dto.user.request.UserRegistrationDto;
-import ge.games.gegames.Dto.user.responce.UserDto;
+import ge.games.gegames.dto.user.request.UserLoginRequestDto;
+import ge.games.gegames.dto.user.request.UserRegistrationDto;
+import ge.games.gegames.dto.user.responce.UserDto;
 import ge.games.gegames.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

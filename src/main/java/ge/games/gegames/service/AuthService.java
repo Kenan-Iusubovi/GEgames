@@ -1,8 +1,8 @@
 package ge.games.gegames.service;
 
-import ge.games.gegames.Dto.user.request.UserLoginRequestDto;
-import ge.games.gegames.Dto.user.request.UserRegistrationDto;
-import ge.games.gegames.Dto.user.responce.UserDto;
+import ge.games.gegames.dto.user.request.UserLoginRequestDto;
+import ge.games.gegames.dto.user.request.UserRegistrationDto;
+import ge.games.gegames.dto.user.responce.UserDto;
 import ge.games.gegames.security.exception.RestApiException;
 import ge.games.gegames.security.auth.CookieService;
 import ge.games.gegames.security.auth.JwtService;

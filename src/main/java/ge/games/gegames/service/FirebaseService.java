@@ -40,7 +40,6 @@ public class FirebaseService {
 
             return User.builder()
                     .id(0)
-                    .nickname("User" + System.currentTimeMillis())
                     .login(getLoginFromToken(token))
                     .password("fire_base")
                     .roles(Set.of(new Role(2, "USER")))
