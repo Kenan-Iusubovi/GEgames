@@ -5,10 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
-import java.util.ResourceBundle;
-
 @Configuration
-public class LanguageConfig {
+public class EmailLanguageConfig {
 
     @Bean
     public MessageSource messageSource(){
