@@ -74,9 +74,9 @@ public class UserService {
 
         String verificationCode = verificationService.createVerificationCode(user.getLogin());
 
-        user = repository.save(user);
-
         emailSenderService.sendVerificationEmail(user.getLogin(), dto.getLanguage(), verificationCode);
+
+        user = repository.save(user);
 
         return UserDto.from(user, "Registration successful! A confirmation email has been sent to you." +
                 " Please check your inbox and spam folder. If you haven't received it, contact support.");

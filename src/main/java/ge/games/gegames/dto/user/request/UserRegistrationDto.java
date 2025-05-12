@@ -1,5 +1,6 @@
 package ge.games.gegames.dto.user.request;
 
+import ge.games.gegames.enums.LanguageE;
 import ge.games.gegames.validation.EmailOrPhone;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -20,8 +21,6 @@ public class UserRegistrationDto {
     )
     private String password;
 
-    @NotBlank(message = "Language is required")
-    @Pattern(regexp = "^[a-z]{2}$", message = "Language must be a two-letter lowercase code")
-    private String language;
+    private LanguageE language;
 
 }
