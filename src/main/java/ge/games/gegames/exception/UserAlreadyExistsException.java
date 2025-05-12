@@ -7,6 +7,7 @@ public class UserAlreadyExistsException extends RuntimeException {
     }
 
     public static UserAlreadyExistsException forField(String fieldName, String value) {
-        return new UserAlreadyExistsException("A user with " + fieldName + " '" + value + "' already exists.");
+        return new UserAlreadyExistsException("A user with " + fieldName + " '" + value + "' already exists. Please try " +
+                "login with Gmail");
     }
 }

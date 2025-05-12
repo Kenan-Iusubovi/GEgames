@@ -1,43 +1,71 @@
 package ge.games.gegames.service;
 
-import io.netty.util.internal.StringUtil;
+import ge.games.gegames.entity.verification_code.EmailVerificationCode;
+import ge.games.gegames.exception.VerificationCodeException;
+import ge.games.gegames.repository.EmailVerificationCodeRepository;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class EmailVerificationService {
 
-    private final StringRedisTemplate redisTemplate;
-
     private static final Duration EXPIRATION = Duration.ofMinutes(15);
 
+    private final EmailVerificationCodeRepository repository;
 
-    public void saveVerificationCode(String email, String code){
 
-        String key = getKey(email);
-        redisTemplate.opsForValue().set(key, code, EXPIRATION);
+    private void saveVerificationCode(String email, String code){
+
+        repository.save(EmailVerificationCode.create(email,code));
     }
 
     public boolean verifyCode(String email, String inputCode){
 
-        String key = getKey(email);
-        String storedCode = redisTemplate.opsForValue().get(key);
+        EmailVerificationCode storedCode = repository.findById(email)
+                .orElseThrow(() -> VerificationCodeException.notFound(email));
 
-        if (!StringUtil.isNullOrEmpty(storedCode) && storedCode.equals(inputCode)){
+        if (storedCode.getCreatedAt().plus(EXPIRATION).isBefore(LocalDateTime.now())) {
 
-            redisTemplate.delete(key);
-            return true;
+            throw VerificationCodeException.expired();
         }
 
-        return false;
+        if (!storedCode.getCode().equals(inputCode)){
+
+            throw VerificationCodeException.incorrectCode();
+        }
+
+        repository.delete(storedCode);
+
+        return true;
     }
 
-    private String getKey(String email){
+    public String createVerificationCode(@Email String email) {
 
-        return "verify:" + email;
+        String verificationCode = UUID.randomUUID().toString();
+
+        saveVerificationCode(email,verificationCode);
+
+        return verificationCode;
+    }
+
+    public String updateVerificationCode (@Email String email){
+
+        EmailVerificationCode storedCode = repository.findById(email)
+                .orElseThrow(() -> VerificationCodeException.notFound(email));
+
+        String verificationCode = UUID.randomUUID().toString();
+
+        storedCode.setCode(verificationCode);
+        storedCode.setCreatedAt(LocalDateTime.now());
+
+        saveVerificationCode(email,verificationCode);
+
+        return verificationCode;
     }
 }

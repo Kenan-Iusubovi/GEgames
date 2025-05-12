@@ -20,4 +20,8 @@ public class UserRegistrationDto {
     )
     private String password;
 
+    @NotBlank(message = "Language is required")
+    @Pattern(regexp = "^[a-z]{2}$", message = "Language must be a two-letter lowercase code")
+    private String language;
+
 }

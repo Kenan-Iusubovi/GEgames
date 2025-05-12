@@ -20,6 +20,10 @@ public class UserService {
 
     private final FirebaseService firebaseService;
 
+    private final EmailSenderService emailSenderService;
+
+    private final EmailVerificationService verificationService;
+
 
 
     public UserDto getUserByFirebaseToken(String token){
@@ -51,7 +55,7 @@ public class UserService {
     private void isUserAlreadyExistsThrows(String emailOrPhone){
 
        if (isUserExists(emailOrPhone)){
-           throw UserAlreadyExistsException.forField("EMAIL OR PHONE", emailOrPhone);
+           throw UserAlreadyExistsException.forField("EMAIL ", emailOrPhone);
        }
     }
 
@@ -67,7 +71,12 @@ public class UserService {
 
         User user = User.registration(dto);
         generateNickname(user);
+
+        String verificationCode = verificationService.createVerificationCode(user.getLogin());
+
         user = repository.save(user);
+
+        emailSenderService.sendVerificationEmail(user.getLogin(), dto.getLanguage(), verificationCode);
 
         return UserDto.from(user, "Registration successful! A confirmation email has been sent to you." +
                 " Please check your inbox and spam folder. If you haven't received it, contact support.");
